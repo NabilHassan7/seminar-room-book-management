@@ -4,7 +4,8 @@ CFLAGS = -Wall -Wextra -std=c17 -Iinclude
 
 SRC = \
 	src/core/main.c \
-	src/core/file.c
+	src/core/file.c \
+	src/core/auth.c
 
 OUT = build/seminar_system.exe
 
