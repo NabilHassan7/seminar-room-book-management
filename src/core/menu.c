@@ -6,6 +6,7 @@
 #include "../../include/book.h"
 #include "../../include/student.h"
 #include "../../include/transaction.h"
+#include "../../include/fine.h"
 
 void showAdminMenu(User loggedInUser)
 {
@@ -109,7 +110,7 @@ void showAdminMenu(User loggedInUser)
                 break;
 
             case 15:
-                printf("\nFine Management module will be added later.\n");
+                fineManagementMenu();
                 break;
 
             case 16:
