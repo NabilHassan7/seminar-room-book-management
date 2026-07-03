@@ -20,6 +20,26 @@ static void readLine(char *buffer, int size)
     buffer[strcspn(buffer, "\n")] = '\0';
 }
 
+int calculateOverdueDays(Date dueDate, Date checkDate)
+{
+    if (compareDates(checkDate, dueDate) <= 0)
+    {
+        return 0;
+    }
+
+    return daysBetween(dueDate, checkDate);
+}
+
+double calculateFineAmount(int overdueDays)
+{
+    if (overdueDays <= 0)
+    {
+        return 0.0;
+    }
+
+    return overdueDays * FINE_PER_DAY;
+}
+
 int getNextTransactionId(void)
 {
     FILE *file = fopen(TRANSACTIONS_FILE, "rb");
@@ -61,6 +81,49 @@ int hasActiveIssue(const char *studentId, const char *bookId)
         {
             fclose(file);
             return 1;
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
+int hasUnpaidFine(const char *studentId)
+{
+    FILE *file = fopen(TRANSACTIONS_FILE, "rb");
+    Transaction transaction;
+    Date today = getCurrentDate();
+    int overdueDays;
+    double fineAmount;
+
+    if (file == NULL)
+    {
+        return 0;
+    }
+
+    while (fread(&transaction, sizeof(Transaction), 1, file) == 1)
+    {
+        if (strcmp(transaction.userId, studentId) == 0)
+        {
+            if (strcmp(transaction.status, TRANSACTION_ISSUED) == 0)
+            {
+                overdueDays = calculateOverdueDays(transaction.dueDate, today);
+                fineAmount = calculateFineAmount(overdueDays);
+
+                if (fineAmount > 0)
+                {
+                    fclose(file);
+                    return 1;
+                }
+            }
+
+            if (strcmp(transaction.status, TRANSACTION_RETURNED) == 0 &&
+                transaction.fineAmount > 0 &&
+                transaction.finePaid == FINE_UNPAID)
+            {
+                fclose(file);
+                return 1;
+            }
         }
     }
 
@@ -146,6 +209,13 @@ void issueBook(void)
     if (!studentExistsById(studentId))
     {
         printf("\nError: Active student not found.\n");
+        return;
+    }
+
+    if (hasUnpaidFine(studentId))
+    {
+        printf("\nError: Student has unpaid overdue fine.\n");
+        printf("Book issue is blocked until the fine is paid.\n");
         return;
     }
 
@@ -239,6 +309,23 @@ void returnBook(void)
             strcmp(transaction.status, TRANSACTION_ISSUED) == 0)
         {
             transaction.returnDate = getCurrentDate();
+
+            transaction.overdueDays = calculateOverdueDays(
+                transaction.dueDate,
+                transaction.returnDate
+            );
+
+            transaction.fineAmount = calculateFineAmount(transaction.overdueDays);
+
+            if (transaction.fineAmount > 0)
+            {
+                transaction.finePaid = FINE_UNPAID;
+            }
+            else
+            {
+                transaction.finePaid = FINE_PAID;
+            }
+
             strcpy(transaction.status, TRANSACTION_RETURNED);
 
             fseek(file, -(long)sizeof(Transaction), SEEK_CUR);
@@ -263,9 +350,19 @@ void returnBook(void)
     }
 
     printf("\nBook returned successfully.\n");
-    printf("Book ID     : %s\n", transaction.bookId);
-    printf("Student ID  : %s\n", transaction.userId);
-    printf("Return Date : ");
+    printf("Book ID       : %s\n", transaction.bookId);
+    printf("Student ID    : %s\n", transaction.userId);
+    printf("Return Date   : ");
     printDate(transaction.returnDate);
-    printf("\n");
+    printf("\nOverdue Days  : %d\n", transaction.overdueDays);
+    printf("Fine Amount   : %.2f Taka\n", transaction.fineAmount);
+
+    if (transaction.fineAmount > 0)
+    {
+        printf("Fine Status   : Unpaid\n");
+    }
+    else
+    {
+        printf("Fine Status   : No fine\n");
+    }
 }
