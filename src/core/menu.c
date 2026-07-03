@@ -3,6 +3,7 @@
 #include "../../include/config.h"
 #include "../../include/models.h"
 #include "../../include/menu.h"
+#include "../../include/book.h"
 
 void showAdminMenu(User loggedInUser)
 {
@@ -50,27 +51,27 @@ void showAdminMenu(User loggedInUser)
         switch (choice)
         {
             case 1:
-                printf("\nAdd Book module will be added next.\n");
+                addBook();
                 break;
 
             case 2:
-                printf("\nRemove Book module will be added later.\n");
+                removeBook();
                 break;
 
             case 3:
-                printf("\nUpdate Book module will be added later.\n");
+                updateBook();
                 break;
 
             case 4:
-                printf("\nSearch Books module will be added later.\n");
+                searchBooks();
                 break;
 
             case 5:
-                printf("\nView Available Books module will be added later.\n");
+                viewAvailableBooks();
                 break;
 
             case 6:
-                printf("\nRegister Student module will be added later.\n");
+                printf("\nRegister Student module will be added next.\n");
                 break;
 
             case 7:
