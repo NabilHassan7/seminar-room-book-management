@@ -3,7 +3,8 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c17 -Iinclude
 
 SRC = \
-	src/core/main.c
+	src/core/main.c \
+	src/core/file.c
 
 OUT = build/seminar_system.exe
 

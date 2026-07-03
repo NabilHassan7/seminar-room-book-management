@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "../../include/config.h"
 #include "../../include/models.h"
-
+#include "../../include/file.h"
 
 void displayStartupScreen(void);
 
@@ -9,8 +9,10 @@ int main(void)
 {
     displayStartupScreen();
 
-    printf("\nSystem initialized successfully.\n");
-    printf("Next step: Binary file initialization and admin account setup.\n\n");
+    initializeSystemFiles();
+
+    printf("\nSystem files initialized successfully.\n");
+    printf("Next step: Admin account setup.\n\n");
 
     return 0;
 }
