@@ -1,13 +1,17 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude
-SRC = src/main.c
-OUT = build/seminar_system
+
+CFLAGS = -Wall -Wextra -std=c17 -Iinclude
+
+SRC = \
+	src/core/main.c
+
+OUT = build/seminar_system.exe
 
 all:
 	$(CC) $(CFLAGS) $(SRC) -o $(OUT)
 
 run:
-	./$(OUT)
+	.\$(OUT)
 
 clean:
-	rm -f $(OUT)
+	del /Q build\*.exe 2>nul
