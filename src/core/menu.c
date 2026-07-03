@@ -4,6 +4,7 @@
 #include "../../include/models.h"
 #include "../../include/menu.h"
 #include "../../include/book.h"
+#include "../../include/student.h"
 
 void showAdminMenu(User loggedInUser)
 {
@@ -71,19 +72,19 @@ void showAdminMenu(User loggedInUser)
                 break;
 
             case 6:
-                printf("\nRegister Student module will be added next.\n");
+                registerStudent();
                 break;
 
             case 7:
-                printf("\nRemove Student module will be added later.\n");
+                removeStudent();
                 break;
 
             case 8:
-                printf("\nView Registered Students module will be added later.\n");
+                viewRegisteredStudents();
                 break;
 
             case 9:
-                printf("\nSearch Student module will be added later.\n");
+                searchStudent();
                 break;
 
             case 10:

@@ -7,7 +7,8 @@ SRC = \
 	src/core/file.c \
 	src/core/auth.c \
 	src/core/menu.c \
-	src/modules/book.c
+	src/modules/book.c \
+	src/modules/student.c
 
 OUT = build/seminar_system.exe
 
