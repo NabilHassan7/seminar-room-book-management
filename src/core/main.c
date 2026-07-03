@@ -5,6 +5,7 @@
 #include "../../include/models.h"
 #include "../../include/file.h"
 #include "../../include/auth.h"
+#include "../../include/menu.h"
 
 void displayStartupScreen(void);
 
@@ -25,7 +26,7 @@ int main(void)
 
         if (strcmp(loggedInUser.role, ROLE_ADMIN) == 0)
         {
-            printf("\nAdmin dashboard will be added in the next step.\n");
+            showAdminMenu(loggedInUser);
         }
         else if (strcmp(loggedInUser.role, ROLE_STUDENT) == 0)
         {
@@ -36,8 +37,6 @@ int main(void)
     {
         printf("\nAccess denied.\n");
     }
-
-    printf("\nNext step: Build Admin menu shell.\n\n");
 
     return 0;
 }
