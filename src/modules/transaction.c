@@ -20,6 +20,37 @@ static void readLine(char *buffer, int size)
     buffer[strcspn(buffer, "\n")] = '\0';
 }
 
+static void printTransactionHeader(void)
+{
+    printf("\n%-8s %-12s %-12s %-12s %-12s %-12s %-12s %-14s %-12s\n",
+           "Txn ID", "Book ID", "Student ID", "Issue Date", "Due Date",
+           "Return Date", "Status", "Overdue Days", "Fine");
+
+    printf("------------------------------------------------------------------------------------------------------------------------\n");
+}
+
+static void printTransactionRow(Transaction transaction)
+{
+    printf("%-8d %-12s %-12s ",
+           transaction.transactionId,
+           transaction.bookId,
+           transaction.userId);
+
+    printDate(transaction.issueDate);
+    printf("   ");
+
+    printDate(transaction.dueDate);
+    printf("   ");
+
+    printDate(transaction.returnDate);
+    printf("   ");
+
+    printf("%-12s %-14d %.2f Taka\n",
+           transaction.status,
+           transaction.overdueDays,
+           transaction.fineAmount);
+}
+
 int calculateOverdueDays(Date dueDate, Date checkDate)
 {
     if (compareDates(checkDate, dueDate) <= 0)
@@ -364,5 +395,121 @@ void returnBook(void)
     else
     {
         printf("Fine Status   : No fine\n");
+    }
+}
+
+void viewIssuedBooks(void)
+{
+    FILE *file = fopen(TRANSACTIONS_FILE, "rb");
+    Transaction transaction;
+    Date today = getCurrentDate();
+    int found = 0;
+
+    if (file == NULL)
+    {
+        printf("\nError: Could not open transactions file.\n");
+        return;
+    }
+
+    printf("\nISSUED BOOKS\n");
+
+    while (fread(&transaction, sizeof(Transaction), 1, file) == 1)
+    {
+        if (strcmp(transaction.status, TRANSACTION_ISSUED) == 0)
+        {
+            transaction.overdueDays = calculateOverdueDays(transaction.dueDate, today);
+            transaction.fineAmount = calculateFineAmount(transaction.overdueDays);
+
+            if (!found)
+            {
+                printTransactionHeader();
+            }
+
+            printTransactionRow(transaction);
+            found = 1;
+        }
+    }
+
+    fclose(file);
+
+    if (!found)
+    {
+        printf("\nNo issued books found.\n");
+    }
+}
+
+void viewOverdueBooks(void)
+{
+    FILE *file = fopen(TRANSACTIONS_FILE, "rb");
+    Transaction transaction;
+    Date today = getCurrentDate();
+    int found = 0;
+
+    if (file == NULL)
+    {
+        printf("\nError: Could not open transactions file.\n");
+        return;
+    }
+
+    printf("\nOVERDUE BOOKS\n");
+
+    while (fread(&transaction, sizeof(Transaction), 1, file) == 1)
+    {
+        if (strcmp(transaction.status, TRANSACTION_ISSUED) == 0)
+        {
+            transaction.overdueDays = calculateOverdueDays(transaction.dueDate, today);
+            transaction.fineAmount = calculateFineAmount(transaction.overdueDays);
+
+            if (transaction.overdueDays > 0)
+            {
+                if (!found)
+                {
+                    printTransactionHeader();
+                }
+
+                printTransactionRow(transaction);
+                found = 1;
+            }
+        }
+    }
+
+    fclose(file);
+
+    if (!found)
+    {
+        printf("\nNo overdue books found.\n");
+    }
+}
+
+void viewIssueHistory(void)
+{
+    FILE *file = fopen(TRANSACTIONS_FILE, "rb");
+    Transaction transaction;
+    int found = 0;
+
+    if (file == NULL)
+    {
+        printf("\nError: Could not open transactions file.\n");
+        return;
+    }
+
+    printf("\nISSUE HISTORY\n");
+
+    while (fread(&transaction, sizeof(Transaction), 1, file) == 1)
+    {
+        if (!found)
+        {
+            printTransactionHeader();
+        }
+
+        printTransactionRow(transaction);
+        found = 1;
+    }
+
+    fclose(file);
+
+    if (!found)
+    {
+        printf("\nNo issue history found.\n");
     }
 }

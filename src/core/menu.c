@@ -97,15 +97,15 @@ void showAdminMenu(User loggedInUser)
                 break;
 
             case 12:
-                printf("\nIssued Books module will be added later.\n");
+                viewIssuedBooks();
                 break;
 
             case 13:
-                printf("\nOverdue Books module will be added later.\n");
+                viewOverdueBooks();
                 break;
 
             case 14:
-                printf("\nIssue History module will be added later.\n");
+                viewIssueHistory();
                 break;
 
             case 15:

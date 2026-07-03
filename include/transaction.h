@@ -6,6 +6,10 @@
 void issueBook(void);
 void returnBook(void);
 
+void viewIssuedBooks(void);
+void viewOverdueBooks(void);
+void viewIssueHistory(void);
+
 int getNextTransactionId(void);
 int hasActiveIssue(const char *studentId, const char *bookId);
 int hasUnpaidFine(const char *studentId);
