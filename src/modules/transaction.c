@@ -1,0 +1,271 @@
+#include <stdio.h>
+#include <string.h>
+
+#include "../../include/config.h"
+#include "../../include/models.h"
+#include "../../include/transaction.h"
+#include "../../include/date.h"
+#include "../../include/book.h"
+#include "../../include/student.h"
+
+static void clearInputBuffer(void)
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+static void readLine(char *buffer, int size)
+{
+    fgets(buffer, size, stdin);
+    buffer[strcspn(buffer, "\n")] = '\0';
+}
+
+int getNextTransactionId(void)
+{
+    FILE *file = fopen(TRANSACTIONS_FILE, "rb");
+    Transaction transaction;
+    int maxId = 0;
+
+    if (file == NULL)
+    {
+        return 1;
+    }
+
+    while (fread(&transaction, sizeof(Transaction), 1, file) == 1)
+    {
+        if (transaction.transactionId > maxId)
+        {
+            maxId = transaction.transactionId;
+        }
+    }
+
+    fclose(file);
+    return maxId + 1;
+}
+
+int hasActiveIssue(const char *studentId, const char *bookId)
+{
+    FILE *file = fopen(TRANSACTIONS_FILE, "rb");
+    Transaction transaction;
+
+    if (file == NULL)
+    {
+        return 0;
+    }
+
+    while (fread(&transaction, sizeof(Transaction), 1, file) == 1)
+    {
+        if (strcmp(transaction.userId, studentId) == 0 &&
+            strcmp(transaction.bookId, bookId) == 0 &&
+            strcmp(transaction.status, TRANSACTION_ISSUED) == 0)
+        {
+            fclose(file);
+            return 1;
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
+static int reduceAvailableCopy(const char *bookId)
+{
+    FILE *file = fopen(BOOKS_FILE, "rb+");
+    Book book;
+
+    if (file == NULL)
+    {
+        return 0;
+    }
+
+    while (fread(&book, sizeof(Book), 1, file) == 1)
+    {
+        if (strcmp(book.id, bookId) == 0 &&
+            book.isActive == STATUS_ACTIVE &&
+            book.availableCopies > 0)
+        {
+            book.availableCopies--;
+
+            fseek(file, -(long)sizeof(Book), SEEK_CUR);
+            fwrite(&book, sizeof(Book), 1, file);
+
+            fclose(file);
+            return 1;
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
+static int increaseAvailableCopy(const char *bookId)
+{
+    FILE *file = fopen(BOOKS_FILE, "rb+");
+    Book book;
+
+    if (file == NULL)
+    {
+        return 0;
+    }
+
+    while (fread(&book, sizeof(Book), 1, file) == 1)
+    {
+        if (strcmp(book.id, bookId) == 0 &&
+            book.isActive == STATUS_ACTIVE &&
+            book.availableCopies < book.totalCopies)
+        {
+            book.availableCopies++;
+
+            fseek(file, -(long)sizeof(Book), SEEK_CUR);
+            fwrite(&book, sizeof(Book), 1, file);
+
+            fclose(file);
+            return 1;
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
+void issueBook(void)
+{
+    FILE *file;
+    Transaction transaction;
+
+    char studentId[MAX_ID_LEN];
+    char bookId[MAX_ID_LEN];
+
+    printf("\nISSUE BOOK\n");
+
+    clearInputBuffer();
+
+    printf("Student ID: ");
+    readLine(studentId, MAX_ID_LEN);
+
+    if (!studentExistsById(studentId))
+    {
+        printf("\nError: Active student not found.\n");
+        return;
+    }
+
+    printf("Book ID: ");
+    readLine(bookId, MAX_ID_LEN);
+
+    if (!bookExistsById(bookId))
+    {
+        printf("\nError: Active book not found.\n");
+        return;
+    }
+
+    if (hasActiveIssue(studentId, bookId))
+    {
+        printf("\nError: This student already has this book issued.\n");
+        return;
+    }
+
+    if (!reduceAvailableCopy(bookId))
+    {
+        printf("\nError: Book is not available for issue.\n");
+        return;
+    }
+
+    transaction.transactionId = getNextTransactionId();
+    strcpy(transaction.bookId, bookId);
+    strcpy(transaction.userId, studentId);
+
+    transaction.issueDate = getCurrentDate();
+    transaction.dueDate = addDays(transaction.issueDate, LOAN_PERIOD_DAYS);
+
+    transaction.returnDate.day = 0;
+    transaction.returnDate.month = 0;
+    transaction.returnDate.year = 0;
+
+    strcpy(transaction.status, TRANSACTION_ISSUED);
+
+    transaction.overdueDays = 0;
+    transaction.fineAmount = 0.0;
+    transaction.finePaid = FINE_PAID;
+
+    file = fopen(TRANSACTIONS_FILE, "ab");
+
+    if (file == NULL)
+    {
+        increaseAvailableCopy(bookId);
+        printf("\nError: Could not open transactions file.\n");
+        return;
+    }
+
+    fwrite(&transaction, sizeof(Transaction), 1, file);
+    fclose(file);
+
+    printf("\nBook issued successfully.\n");
+    printf("Transaction ID: %d\n", transaction.transactionId);
+    printf("Issue Date    : ");
+    printDate(transaction.issueDate);
+    printf("\nDue Date      : ");
+    printDate(transaction.dueDate);
+    printf("\n");
+}
+
+void returnBook(void)
+{
+    FILE *file = fopen(TRANSACTIONS_FILE, "rb+");
+    Transaction transaction;
+
+    int transactionId;
+    int found = 0;
+
+    if (file == NULL)
+    {
+        printf("\nError: Could not open transactions file.\n");
+        return;
+    }
+
+    printf("\nRETURN BOOK\n");
+    printf("Transaction ID: ");
+
+    if (scanf("%d", &transactionId) != 1)
+    {
+        printf("\nInvalid transaction ID.\n");
+        clearInputBuffer();
+        fclose(file);
+        return;
+    }
+
+    while (fread(&transaction, sizeof(Transaction), 1, file) == 1)
+    {
+        if (transaction.transactionId == transactionId &&
+            strcmp(transaction.status, TRANSACTION_ISSUED) == 0)
+        {
+            transaction.returnDate = getCurrentDate();
+            strcpy(transaction.status, TRANSACTION_RETURNED);
+
+            fseek(file, -(long)sizeof(Transaction), SEEK_CUR);
+            fwrite(&transaction, sizeof(Transaction), 1, file);
+
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(file);
+
+    if (!found)
+    {
+        printf("\nActive issued transaction not found.\n");
+        return;
+    }
+
+    if (!increaseAvailableCopy(transaction.bookId))
+    {
+        printf("\nWarning: Book returned, but available copy update failed.\n");
+    }
+
+    printf("\nBook returned successfully.\n");
+    printf("Book ID     : %s\n", transaction.bookId);
+    printf("Student ID  : %s\n", transaction.userId);
+    printf("Return Date : ");
+    printDate(transaction.returnDate);
+    printf("\n");
+}

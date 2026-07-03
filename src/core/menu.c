@@ -5,6 +5,7 @@
 #include "../../include/menu.h"
 #include "../../include/book.h"
 #include "../../include/student.h"
+#include "../../include/transaction.h"
 
 void showAdminMenu(User loggedInUser)
 {
@@ -88,11 +89,11 @@ void showAdminMenu(User loggedInUser)
                 break;
 
             case 10:
-                printf("\nIssue Book module will be added later.\n");
+                issueBook();
                 break;
 
             case 11:
-                printf("\nReturn Book module will be added later.\n");
+                returnBook();
                 break;
 
             case 12:
