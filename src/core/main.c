@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "../../include/config.h"
 #include "../../include/models.h"
@@ -9,18 +10,34 @@ void displayStartupScreen(void);
 
 int main(void)
 {
+    User loggedInUser;
+
     displayStartupScreen();
 
     initializeSystemFiles();
     seedAdminAccount();
 
-    printf("\nSystem files initialized successfully.\n");
-    printf("Admin account setup completed.\n");
-    printf("\nDefault Admin Login:\n");
-    printf("ID       : %s\n", DEFAULT_ADMIN_ID);
-    printf("Password : %s\n", DEFAULT_ADMIN_PASSWORD);
+    if (login(&loggedInUser))
+    {
+        printf("\nLogin successful.\n");
+        printf("Welcome, %s\n", loggedInUser.name);
+        printf("Role: %s\n", loggedInUser.role);
 
-    printf("\nNext step: Build authentication login flow.\n\n");
+        if (strcmp(loggedInUser.role, ROLE_ADMIN) == 0)
+        {
+            printf("\nAdmin dashboard will be added in the next step.\n");
+        }
+        else if (strcmp(loggedInUser.role, ROLE_STUDENT) == 0)
+        {
+            printf("\nStudent dashboard will be added later.\n");
+        }
+    }
+    else
+    {
+        printf("\nAccess denied.\n");
+    }
+
+    printf("\nNext step: Build Admin menu shell.\n\n");
 
     return 0;
 }
