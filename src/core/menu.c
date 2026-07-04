@@ -8,6 +8,7 @@
 #include "../../include/transaction.h"
 #include "../../include/fine.h"
 #include "../../include/report.h"
+#include "../../include/export.h"
 
 void showAdminMenu(User loggedInUser)
 {
@@ -119,7 +120,7 @@ void showAdminMenu(User loggedInUser)
                 break;
 
             case 17:
-                printf("\nExport CSV module will be added later.\n");
+                exportMenu();
                 break;
 
             case 18:

@@ -12,6 +12,7 @@ SRC = \
 	src/modules/transaction.c \
 	src/modules/fine.c \
 	src/modules/report.c \
+	src/modules/export.c \
 	src/system/date.c
 
 OUT = build/seminar_system.exe
