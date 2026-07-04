@@ -9,6 +9,7 @@
 #include "../../include/fine.h"
 #include "../../include/report.h"
 #include "../../include/export.h"
+#include "../../include/utils.h"
 
 void showAdminMenu(User loggedInUser)
 {
@@ -44,71 +45,79 @@ void showAdminMenu(User loggedInUser)
         printf("18. Logout\n");
 
         printf("============================================================\n");
-        printf("Enter choice: ");
 
-        if (scanf("%d", &choice) != 1)
-        {
-            printf("\nInvalid input. Please enter a number.\n");
-            while (getchar() != '\n');
-            continue;
-        }
+        choice = readInt("Enter choice: ");
 
         switch (choice)
         {
             case 1:
                 addBook();
+                pauseScreen();
                 break;
 
             case 2:
                 removeBook();
+                pauseScreen();
                 break;
 
             case 3:
                 updateBook();
+                pauseScreen();
                 break;
 
             case 4:
                 searchBooks();
+                pauseScreen();
                 break;
 
             case 5:
                 viewAvailableBooks();
+                pauseScreen();
                 break;
 
             case 6:
                 registerStudent();
+                pauseScreen();
                 break;
 
             case 7:
                 removeStudent();
+                pauseScreen();
                 break;
 
             case 8:
                 viewRegisteredStudents();
+                pauseScreen();
                 break;
 
             case 9:
                 searchStudent();
+                pauseScreen();
                 break;
 
             case 10:
                 issueBook();
+                pauseScreen();
                 break;
 
             case 11:
                 returnBook();
+                pauseScreen();
                 break;
 
             case 12:
                 viewIssuedBooks();
+                pauseScreen();
                 break;
 
             case 13:
                 viewOverdueBooks();
+                pauseScreen();
                 break;
 
             case 14:
                 viewIssueHistory();
+                pauseScreen();
                 break;
 
             case 15:
@@ -129,6 +138,7 @@ void showAdminMenu(User loggedInUser)
 
             default:
                 printf("\nInvalid choice. Please select between 1 and 18.\n");
+                pauseScreen();
         }
 
     } while (choice != 18);
@@ -151,27 +161,24 @@ void showStudentMenu(User loggedInUser)
         printf("4. Logout\n");
 
         printf("============================================================\n");
-        printf("Enter choice: ");
 
-        if (scanf("%d", &choice) != 1)
-        {
-            printf("\nInvalid input. Please enter a number.\n");
-            while (getchar() != '\n');
-            continue;
-        }
+        choice = readInt("Enter choice: ");
 
         switch (choice)
         {
             case 1:
                 searchBooks();
+                pauseScreen();
                 break;
 
             case 2:
                 viewAvailableBooks();
+                pauseScreen();
                 break;
 
             case 3:
                 viewStudentBorrowingHistory(loggedInUser.id);
+                pauseScreen();
                 break;
 
             case 4:
@@ -180,6 +187,7 @@ void showStudentMenu(User loggedInUser)
 
             default:
                 printf("\nInvalid choice. Please select between 1 and 4.\n");
+                pauseScreen();
         }
 
     } while (choice != 4);
