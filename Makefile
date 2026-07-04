@@ -13,6 +13,7 @@ SRC = \
 	src/modules/fine.c \
 	src/modules/report.c \
 	src/modules/export.c \
+	src/modules/test.c \
 	src/system/date.c \
 	src/system/utils.c
 
@@ -25,4 +26,4 @@ run:
 	.\$(OUT)
 
 clean:
-	del /Q build\*.exe 2>nul
+	if exist build\seminar_system.exe del /Q build\seminar_system.exe

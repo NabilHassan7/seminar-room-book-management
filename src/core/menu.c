@@ -10,6 +10,7 @@
 #include "../../include/report.h"
 #include "../../include/export.h"
 #include "../../include/utils.h"
+#include "../../include/test.h"
 
 void showAdminMenu(User loggedInUser)
 {
@@ -42,7 +43,8 @@ void showAdminMenu(User loggedInUser)
         printf("\n15. Fine Management\n");
         printf("16. Reports\n");
         printf("17. Export CSV\n");
-        printf("18. Logout\n");
+        printf("18. Test Mode\n");
+        printf("19. Logout\n");
 
         printf("============================================================\n");
 
@@ -133,15 +135,19 @@ void showAdminMenu(User loggedInUser)
                 break;
 
             case 18:
+                testModeMenu();
+                break;
+
+            case 19:
                 printf("\nLogged out successfully.\n");
                 break;
 
             default:
-                printf("\nInvalid choice. Please select between 1 and 18.\n");
+                printf("\nInvalid choice. Please select between 1 and 19.\n");
                 pauseScreen();
         }
 
-    } while (choice != 18);
+    } while (choice != 19);
 }
 
 void showStudentMenu(User loggedInUser)
