@@ -9,6 +9,7 @@ void returnBook(void);
 void viewIssuedBooks(void);
 void viewOverdueBooks(void);
 void viewIssueHistory(void);
+void viewStudentBorrowingHistory(const char *studentId);
 
 int getNextTransactionId(void);
 int hasActiveIssue(const char *studentId, const char *bookId);

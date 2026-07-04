@@ -4,5 +4,6 @@
 #include "models.h"
 
 void showAdminMenu(User loggedInUser);
+void showStudentMenu(User loggedInUser);
 
 #endif

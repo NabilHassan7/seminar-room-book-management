@@ -30,7 +30,7 @@ int main(void)
         }
         else if (strcmp(loggedInUser.role, ROLE_STUDENT) == 0)
         {
-            printf("\nStudent dashboard will be added later.\n");
+            showStudentMenu(loggedInUser);
         }
     }
     else

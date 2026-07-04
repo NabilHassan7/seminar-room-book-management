@@ -513,3 +513,46 @@ void viewIssueHistory(void)
         printf("\nNo issue history found.\n");
     }
 }
+
+void viewStudentBorrowingHistory(const char *studentId)
+{
+    FILE *file = fopen(TRANSACTIONS_FILE, "rb");
+    Transaction transaction;
+    Date today = getCurrentDate();
+    int found = 0;
+
+    if (file == NULL)
+    {
+        printf("\nError: Could not open transactions file.\n");
+        return;
+    }
+
+    printf("\nMY BORROWING HISTORY\n");
+
+    while (fread(&transaction, sizeof(Transaction), 1, file) == 1)
+    {
+        if (strcmp(transaction.userId, studentId) == 0)
+        {
+            if (strcmp(transaction.status, TRANSACTION_ISSUED) == 0)
+            {
+                transaction.overdueDays = calculateOverdueDays(transaction.dueDate, today);
+                transaction.fineAmount = calculateFineAmount(transaction.overdueDays);
+            }
+
+            if (!found)
+            {
+                printTransactionHeader();
+            }
+
+            printTransactionRow(transaction);
+            found = 1;
+        }
+    }
+
+    fclose(file);
+
+    if (!found)
+    {
+        printf("\nNo borrowing history found.\n");
+    }
+}

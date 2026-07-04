@@ -133,3 +133,54 @@ void showAdminMenu(User loggedInUser)
 
     } while (choice != 18);
 }
+
+void showStudentMenu(User loggedInUser)
+{
+    int choice;
+
+    do
+    {
+        printf("\n============================================================\n");
+        printf(" STUDENT DASHBOARD\n");
+        printf(" Logged in as: %s (%s)\n", loggedInUser.name, loggedInUser.id);
+        printf("============================================================\n");
+
+        printf("1. Search Books\n");
+        printf("2. View Available Books\n");
+        printf("3. My Borrowing History\n");
+        printf("4. Logout\n");
+
+        printf("============================================================\n");
+        printf("Enter choice: ");
+
+        if (scanf("%d", &choice) != 1)
+        {
+            printf("\nInvalid input. Please enter a number.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+
+        switch (choice)
+        {
+            case 1:
+                searchBooks();
+                break;
+
+            case 2:
+                viewAvailableBooks();
+                break;
+
+            case 3:
+                viewStudentBorrowingHistory(loggedInUser.id);
+                break;
+
+            case 4:
+                printf("\nLogged out successfully.\n");
+                break;
+
+            default:
+                printf("\nInvalid choice. Please select between 1 and 4.\n");
+        }
+
+    } while (choice != 4);
+}
