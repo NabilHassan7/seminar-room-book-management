@@ -7,6 +7,7 @@
 #include "../../include/student.h"
 #include "../../include/transaction.h"
 #include "../../include/fine.h"
+#include "../../include/report.h"
 
 void showAdminMenu(User loggedInUser)
 {
@@ -114,7 +115,7 @@ void showAdminMenu(User loggedInUser)
                 break;
 
             case 16:
-                printf("\nReports module will be added later.\n");
+                reportsMenu();
                 break;
 
             case 17:
